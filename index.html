@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Live weather updates for 95+ cities across India. Real-time temperature, humidity, wind speed, hourly and weekly forecasts.">
+  <title>India Weather Live — Real-time Weather for Indian Cities</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Paper Plane Cursor -->
+  <svg class="cursor-plane" id="cursor-plane" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="rgba(94,234,212,0.15)" stroke="#5eead4"/>
+  </svg>
+  <div class="cursor-trail" id="cursor-trail"></div>
+
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-gradient"></div>
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    <div class="floating-orb orb-3"></div>
+    <div class="floating-orb orb-4"></div>
+  </div>
+
+  <!-- Header -->
+  <header id="main-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon"><span class="logo-emoji">🌦️</span></div>
+        <div class="logo-text">
+          <h1>India Weather <span class="accent">Live</span></h1>
+          <p class="tagline">Real-time weather across <span id="city-count">95+</span> cities</p>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-pill">
+          <span class="stat-icon">🕐</span>
+          <span>Updated: </span>
+          <span id="last-updated">--</span>
+        </div>
+        <div class="header-controls">
+          <button class="unit-toggle" id="unit-toggle" title="Toggle temperature unit">
+            <span id="unit-c" class="active-unit">°C</span> / <span id="unit-f">°F</span>
+          </button>
+          <button class="refresh-btn" id="refresh-btn" title="Refresh weather data">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <section id="controls-section">
+    <div class="controls-container">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="search-input" placeholder="Search cities, states..." autocomplete="off">
+        <button class="clear-search" id="clear-search">✕</button>
+      </div>
+      <div class="filter-buttons" id="filter-buttons">
+        <button class="filter-btn active" data-region="all"><span class="fi">🇮🇳</span> All India</button>
+        <button class="filter-btn" data-region="North"><span class="fi">🏔️</span> North</button>
+        <button class="filter-btn" data-region="South"><span class="fi">🌴</span> South</button>
+        <button class="filter-btn" data-region="East"><span class="fi">🌊</span> East</button>
+        <button class="filter-btn" data-region="West"><span class="fi">🏖️</span> West</button>
+        <button class="filter-btn" data-region="Central"><span class="fi">🏛️</span> Central</button>
+        <button class="filter-btn" data-region="Northeast"><span class="fi">🍃</span> NE</button>
+      </div>
+      <div class="controls-row">
+        <div class="sort-controls">
+          <label for="sort-select">Sort:</label>
+          <select id="sort-select">
+            <option value="name">City Name</option>
+            <option value="temp-high">Temp ↑</option>
+            <option value="temp-low">Temp ↓</option>
+            <option value="humidity">Humidity</option>
+            <option value="wind">Wind Speed</option>
+          </select>
+        </div>
+        <button class="fav-toggle" id="fav-toggle">
+          <span>⭐</span> Favorites Only
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary Stats -->
+  <section id="summary-section">
+    <div class="summary-container">
+      <div class="summary-card"><div class="si">🔥</div><div class="sinfo"><span class="sl">Hottest</span><span class="sv" id="hottest-city">Loading...</span></div></div>
+      <div class="summary-card"><div class="si">❄️</div><div class="sinfo"><span class="sl">Coldest</span><span class="sv" id="coldest-city">Loading...</span></div></div>
+      <div class="summary-card"><div class="si">💧</div><div class="sinfo"><span class="sl">Most Humid</span><span class="sv" id="humid-city">Loading...</span></div></div>
+      <div class="summary-card"><div class="si">💨</div><div class="sinfo"><span class="sl">Windiest</span><span class="sv" id="windy-city">Loading...</span></div></div>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <section id="loading-section">
+    <div class="loading-container">
+      <div class="weather-loader"><div class="loader-sun"></div><div class="loader-cloud"></div></div>
+      <p class="loading-text">Fetching weather from across India...</p>
+      <div class="loading-progress"><div class="progress-bar" id="progress-bar"></div></div>
+      <p class="loading-sub" id="loading-status">Connecting to weather stations...</p>
+    </div>
+  </section>
+
+  <!-- Weather Grid -->
+  <section id="weather-section">
+    <div class="results-info"><span id="results-count">Showing 0 cities</span></div>
+    <div class="weather-grid" id="weather-grid"></div>
+    <div class="no-results" id="no-results" style="display:none">
+      <div class="nr-icon">🔍</div><h3>No cities found</h3><p>Try adjusting your search or filters</p>
+    </div>
+  </section>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="weather-modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Data by <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a> — Free Weather API · Synced with global forecast models</p>
+    <p class="fsub">India Weather Live © 2026 · Press <kbd>/</kbd> to search</p>
+  </footer>
+
+  <script src="cities.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
